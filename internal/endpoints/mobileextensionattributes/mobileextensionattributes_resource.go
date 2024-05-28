@@ -133,7 +133,6 @@ func ResourceJamfProMobileExtensionAttributesCreate(ctx context.Context, d *sche
 	}
 
 	// Set the resource ID in Terraform state
-	fmt.Println("ID being set")
 	d.SetId(strconv.Itoa(creationResponse.ID))
 
 	// Wait for the resource to be fully available before reading it
@@ -144,21 +143,18 @@ func ResourceJamfProMobileExtensionAttributesCreate(ctx context.Context, d *sche
 		}
 		return apiclient.Conn.GetMobileExtensionAttributeByID(intID)
 	}
-	fmt.Println("Trying to check for resource existing")
 	_, waitDiags := waitfor.ResourceIsAvailable(ctx, d, "Jamf Pro Mobile Extension Attribute", strconv.Itoa(creationResponse.ID), checkResourceExists, time.Duration(common.DefaultPropagationTime)*time.Second, apiclient.EnableCookieJar)
 	if waitDiags.HasError() {
 		return waitDiags
 	}
-	fmt.Println("It apparently exists - let's see")
 	// Read the resource to ensure the Terraform state is up to date
-	// I can't trust this process right now - it's producing inconsistent results by far!!!
-	/*
+
 	readDiags := ResourceJamfProMobileExtensionAttributesRead(ctx, d, meta)
 	fmt.Println("Finished read check again")
 	if len(readDiags) > 0 {
 		diags = append(diags, readDiags...)
 	}
-	*/
+	
 
 	return diags
 }
@@ -184,13 +180,24 @@ func ResourceJamfProMobileExtensionAttributesRead(ctx context.Context, d *schema
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("error converting resource ID '%s' to int: %v", resourceID, err))
 	}
+	// Wait for the resource to be fully available before reading it
+	checkResourceExists := func(id interface{}) (interface{}, error) {
+		intID, err := strconv.Atoi(id.(string))
+		if err != nil {
+			return nil, fmt.Errorf("error converting ID '%v' to integer: %v", id, err)
+		}
+		return apiclient.Conn.GetMobileExtensionAttributeByID(intID)
+	}
+	_, waitDiags := waitfor.ResourceIsAvailable(ctx, d, "Jamf Pro Mobile Extension Attribute", resourceID, checkResourceExists, time.Duration(common.DefaultPropagationTime)*time.Second, apiclient.EnableCookieJar)
+	if waitDiags.HasError() {
+		return waitDiags
+	}
 
 	// Attempt to fetch the resource by ID
 	resource, err := apiclient.Conn.GetMobileExtensionAttributeByID(resourceIDInt)
 
 	if err != nil {
 		// Handle not found error or other errors
-		fmt.Println("Read first error")
 		return state.HandleResourceNotFoundError(err, d)
 	}
 

@@ -41,6 +41,7 @@ import (
 	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/macosconfigurationprofiles"
 	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/macosconfigurationprofilesplist"
 	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/mobiledeviceconfigurationprofilesplist"
+	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/mobileextensionattributes"
 	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/networksegments"
 	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/packages"
 	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/policies"
@@ -273,6 +274,7 @@ func Provider() *schema.Provider {
 			"jamfpro_network_segment":                           networksegments.DataSourceJamfProNetworkSegments(),
 			"jamfpro_macos_configuration_profile_plist":         macosconfigurationprofilesplist.DataSourceJamfProMacOSConfigurationProfilesPlist(),
 			"jamfpro_mobile_device_configuration_profile_plist": mobiledeviceconfigurationprofilesplist.DataSourceJamfProMobileDeviceConfigurationProfilesPlist(),
+			"jamfpro_mobile_extension_attribute":              	 mobileextensionattributes.DataSourceJamfProMobileExtensionAttributes(),
 			"jamfpro_package":                                   packages.DataSourceJamfProPackages(),
 			// "jamfpro_policy":                        policies.DataSourceJamfProPolicies(),
 			"jamfpro_printer":             printers.DataSourceJamfProPrinters(),
@@ -307,6 +309,7 @@ func Provider() *schema.Provider {
 			"jamfpro_macos_configuration_profile":               macosconfigurationprofiles.ResourceJamfProMacOSConfigurationProfiles(),
 			"jamfpro_macos_configuration_profile_plist":         macosconfigurationprofilesplist.ResourceJamfProMacOSConfigurationPlistProfiles(),
 			"jamfpro_mobile_device_configuration_profile_plist": mobiledeviceconfigurationprofilesplist.ResourceJamfProMobileDeviceConfigurationProfilesPlist(),
+			"jamfpro_mobile_extension_attribute":                mobileextensionattributes.ResourceJamfProMobileExtensionAttributes(),
 			"jamfpro_package":                                   packages.ResourceJamfProPackages(),
 			"jamfpro_policy":                                    policies.ResourceJamfProPolicies(),
 			"jamfpro_printer":                                   printers.ResourceJamfProPrinters(),

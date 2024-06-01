@@ -11,6 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 
+	"github.com/deploymenttheory/go-api-http-client/helpers"
 	"github.com/deploymenttheory/go-api-http-client/httpclient"
 	"github.com/deploymenttheory/go-api-sdk-jamfpro/sdk/jamfpro"
 	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/client"
@@ -18,6 +19,7 @@ import (
 
 	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/accountgroups"
 	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/accounts"
+	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/activationcode"
 	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/advancedcomputersearches"
 	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/advancedmobiledevicesearches"
 	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/advancedusersearches"
@@ -28,15 +30,15 @@ import (
 	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/categories"
 	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/computercheckin"
 	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/computerextensionattributes"
-	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/computergroups"
 	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/computerinventory"
+	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/computerinventorycollection"
 	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/computerprestageenrollments"
 	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/departments"
 	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/diskencryptionconfigurations"
 	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/dockitems"
 	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/filesharedistributionpoints"
-	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/macosconfigurationprofiles"
-	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/mobiledeviceconfigurationprofiles"
+	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/macosconfigurationprofilesplist"
+	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/mobiledeviceconfigurationprofilesplist"
 	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/networksegments"
 	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/packages"
 	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/policies"
@@ -44,6 +46,8 @@ import (
 	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/restrictedsoftware"
 	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/scripts"
 	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/sites"
+	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/smartcomputergroups"
+	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/staticcomputergroups"
 	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/usergroups"
 	"github.com/deploymenttheory/terraform-provider-jamfpro/internal/endpoints/webhooks"
 )
@@ -249,64 +253,69 @@ func Provider() *schema.Provider {
 			},
 		},
 		DataSourcesMap: map[string]*schema.Resource{
-			"jamfpro_account":                             accounts.DataSourceJamfProAccounts(),
-			"jamfpro_account_group":                       accountgroups.DataSourceJamfProAccountGroups(),
-			"jamfpro_advanced_computer_search":            advancedcomputersearches.DataSourceJamfProAdvancedComputerSearches(),
-			"jamfpro_advanced_mobile_device_search":       advancedmobiledevicesearches.DataSourceJamfProAdvancedMobileDeviceSearches(),
-			"jamfpro_advanced_user_search":                advancedusersearches.DataSourceJamfProAdvancedUserSearches(),
-			"jamfpro_api_integration":                     apiintegrations.DataSourceJamfProApiIntegrations(),
-			"jamfpro_api_role":                            apiroles.DataSourceJamfProAPIRoles(),
-			"jamfpro_building":                            buildings.DataSourceJamfProBuildings(),
-			"jamfpro_category":                            categories.DataSourceJamfProCategories(),
-			"jamfpro_computer_extension_attribute":        computerextensionattributes.DataSourceJamfProComputerExtensionAttributes(),
-			"jamfpro_computer_group":                      computergroups.DataSourceJamfProComputerGroups(),
-			"jamfpro_computer_inventory":                  computerinventory.DataSourceJamfProComputerInventory(),
-			"jamfpro_computer_prestage_enrollment":        computerprestageenrollments.DataSourceJamfProComputerPrestageEnrollmentEnrollment(),
-			"jamfpro_department":                          departments.DataSourceJamfProDepartments(),
-			"jamfpro_disk_encryption_configuration":       diskencryptionconfigurations.DataSourceJamfProDiskEncryptionConfigurations(),
-			"jamfpro_dock_item":                           dockitems.DataSourceJamfProDockItems(),
-			"jamfpro_file_share_distribution_point":       filesharedistributionpoints.DataSourceJamfProFileShareDistributionPoints(),
-			"jamfpro_network_segment":                     networksegments.DataSourceJamfProNetworkSegments(),
-			"jamfpro_mobile_device_configuration_profile": mobiledeviceconfigurationprofiles.DataSourceJamfProMobileDeviceConfigurationProfiles(),
-			"jamfpro_package":                             packages.DataSourceJamfProPackages(),
-			// "jamfpro_policy":                        policies.DataSourceJamfProPolicies(),
-			"jamfpro_printer":             printers.DataSourceJamfProPrinters(),
-			"jamfpro_script":              scripts.DataSourceJamfProScripts(),
-			"jamfpro_site":                sites.DataSourceJamfProSites(),
-			"jamfpro_restricted_software": restrictedsoftware.DataSourceJamfProRestrictedSoftwares(),
-			"jamfpro_user_group":          usergroups.DataSourceJamfProUserGroups(),
-			"jamfpro_webhook":             webhooks.DataSourceJamfProWebhooks(),
+
+			"jamfpro_account":                                   accounts.DataSourceJamfProAccounts(),
+			"jamfpro_account_group":                             accountgroups.DataSourceJamfProAccountGroups(),
+			"jamfpro_advanced_computer_search":                  advancedcomputersearches.DataSourceJamfProAdvancedComputerSearches(),
+			"jamfpro_advanced_mobile_device_search":             advancedmobiledevicesearches.DataSourceJamfProAdvancedMobileDeviceSearches(),
+			"jamfpro_advanced_user_search":                      advancedusersearches.DataSourceJamfProAdvancedUserSearches(),
+			"jamfpro_api_integration":                           apiintegrations.DataSourceJamfProApiIntegrations(),
+			"jamfpro_api_role":                                  apiroles.DataSourceJamfProAPIRoles(),
+			"jamfpro_building":                                  buildings.DataSourceJamfProBuildings(),
+			"jamfpro_category":                                  categories.DataSourceJamfProCategories(),
+			"jamfpro_computer_extension_attribute":              computerextensionattributes.DataSourceJamfProComputerExtensionAttributes(),
+			"jamfpro_computer_inventory":                        computerinventory.DataSourceJamfProComputerInventory(),
+			"jamfpro_computer_prestage_enrollment":              computerprestageenrollments.DataSourceJamfProComputerPrestageEnrollmentEnrollment(),
+			"jamfpro_department":                                departments.DataSourceJamfProDepartments(),
+			"jamfpro_disk_encryption_configuration":             diskencryptionconfigurations.DataSourceJamfProDiskEncryptionConfigurations(),
+			"jamfpro_dock_item":                                 dockitems.DataSourceJamfProDockItems(),
+			"jamfpro_file_share_distribution_point":             filesharedistributionpoints.DataSourceJamfProFileShareDistributionPoints(),
+			"jamfpro_network_segment":                           networksegments.DataSourceJamfProNetworkSegments(),
+			"jamfpro_macos_configuration_profile_plist":         macosconfigurationprofilesplist.DataSourceJamfProMacOSConfigurationProfilesPlist(),
+			"jamfpro_mobile_device_configuration_profile_plist": mobiledeviceconfigurationprofilesplist.DataSourceJamfProMobileDeviceConfigurationProfilesPlist(),
+			"jamfpro_package":                                   packages.DataSourceJamfProPackages(),
+			"jamfpro_printer":                                   printers.DataSourceJamfProPrinters(),
+			"jamfpro_script":                                    scripts.DataSourceJamfProScripts(),
+			"jamfpro_site":                                      sites.DataSourceJamfProSites(),
+			"jamfpro_smart_computer_group":                      smartcomputergroups.DataSourceJamfProSmartComputerGroups(),
+			"jamfpro_static_computer_group":                     staticcomputergroups.DataSourceJamfProStaticComputerGroups(),
+			"jamfpro_restricted_software":                       restrictedsoftware.DataSourceJamfProRestrictedSoftwares(),
+			"jamfpro_user_group":                                usergroups.DataSourceJamfProUserGroups(),
+			"jamfpro_webhook":                                   webhooks.DataSourceJamfProWebhooks(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"jamfpro_account":                             accounts.ResourceJamfProAccounts(),
-			"jamfpro_account_group":                       accountgroups.ResourceJamfProAccountGroups(),
-			"jamfpro_advanced_computer_search":            advancedcomputersearches.ResourceJamfProAdvancedComputerSearches(),
-			"jamfpro_advanced_mobile_device_search":       advancedmobiledevicesearches.ResourceJamfProAdvancedMobileDeviceSearches(),
-			"jamfpro_advanced_user_search":                advancedusersearches.ResourceJamfProAdvancedUserSearches(),
-			"jamfpro_allowed_file_extension":              allowedfileextensions.ResourceJamfProAllowedFileExtensions(),
-			"jamfpro_api_integration":                     apiintegrations.ResourceJamfProApiIntegrations(),
-			"jamfpro_api_role":                            apiroles.ResourceJamfProAPIRoles(),
-			"jamfpro_building":                            buildings.ResourceJamfProBuildings(),
-			"jamfpro_category":                            categories.ResourceJamfProCategories(),
-			"jamfpro_computer_checkin":                    computercheckin.ResourceJamfProComputerCheckin(),
-			"jamfpro_computer_extension_attribute":        computerextensionattributes.ResourceJamfProComputerExtensionAttributes(),
-			"jamfpro_computer_group":                      computergroups.ResourceJamfProComputerGroups(),
-			"jamfpro_computer_prestage_enrollment":        computerprestageenrollments.ResourceJamfProComputerPrestageEnrollmentEnrollment(),
-			"jamfpro_department":                          departments.ResourceJamfProDepartments(),
-			"jamfpro_disk_encryption_configuration":       diskencryptionconfigurations.ResourceJamfProDiskEncryptionConfigurations(),
-			"jamfpro_dock_item":                           dockitems.ResourceJamfProDockItems(),
-			"jamfpro_file_share_distribution_point":       filesharedistributionpoints.ResourceJamfProFileShareDistributionPoints(),
-			"jamfpro_network_segment":                     networksegments.ResourceJamfProNetworkSegments(),
-			"jamfpro_macos_configuration_profile":         macosconfigurationprofiles.ResourceJamfProMacOSConfigurationProfiles(),
-			"jamfpro_mobile_device_configuration_profile": mobiledeviceconfigurationprofiles.ResourceJamfProMobileDeviceConfigurationProfiles(),
-			"jamfpro_package":                             packages.ResourceJamfProPackages(),
-			"jamfpro_policy":                              policies.ResourceJamfProPolicies(),
-			"jamfpro_printer":                             printers.ResourceJamfProPrinters(),
-			"jamfpro_script":                              scripts.ResourceJamfProScripts(),
-			"jamfpro_site":                                sites.ResourceJamfProSites(),
-			"jamfpro_restricted_software":                 restrictedsoftware.ResourceJamfProRestrictedSoftwares(),
-			"jamfpro_user_group":                          usergroups.ResourceJamfProUserGroups(),
-			"jamfpro_webhook":                             webhooks.ResourceJamfProWebhooks(),
+			"jamfpro_account":                                   accounts.ResourceJamfProAccounts(),
+			"jamfpro_account_group":                             accountgroups.ResourceJamfProAccountGroups(),
+			"jamfpro_activation_code":                           activationcode.ResourceJamfProActivationCode(),
+			"jamfpro_advanced_computer_search":                  advancedcomputersearches.ResourceJamfProAdvancedComputerSearches(),
+			"jamfpro_advanced_mobile_device_search":             advancedmobiledevicesearches.ResourceJamfProAdvancedMobileDeviceSearches(),
+			"jamfpro_advanced_user_search":                      advancedusersearches.ResourceJamfProAdvancedUserSearches(),
+			"jamfpro_allowed_file_extension":                    allowedfileextensions.ResourceJamfProAllowedFileExtensions(),
+			"jamfpro_api_integration":                           apiintegrations.ResourceJamfProApiIntegrations(),
+			"jamfpro_api_role":                                  apiroles.ResourceJamfProAPIRoles(),
+			"jamfpro_building":                                  buildings.ResourceJamfProBuildings(),
+			"jamfpro_category":                                  categories.ResourceJamfProCategories(),
+			"jamfpro_computer_checkin":                          computercheckin.ResourceJamfProComputerCheckin(),
+			"jamfpro_computer_extension_attribute":              computerextensionattributes.ResourceJamfProComputerExtensionAttributes(),
+			"jamfpro_computer_inventory_collection":             computerinventorycollection.ResourceJamfProComputerInventoryCollection(),
+			"jamfpro_computer_prestage_enrollment":              computerprestageenrollments.ResourceJamfProComputerPrestageEnrollmentEnrollment(),
+			"jamfpro_department":                                departments.ResourceJamfProDepartments(),
+			"jamfpro_disk_encryption_configuration":             diskencryptionconfigurations.ResourceJamfProDiskEncryptionConfigurations(),
+			"jamfpro_dock_item":                                 dockitems.ResourceJamfProDockItems(),
+			"jamfpro_file_share_distribution_point":             filesharedistributionpoints.ResourceJamfProFileShareDistributionPoints(),
+			"jamfpro_network_segment":                           networksegments.ResourceJamfProNetworkSegments(),
+			"jamfpro_macos_configuration_profile_plist":         macosconfigurationprofilesplist.ResourceJamfProMacOSConfigurationProfilesPlist(),
+			"jamfpro_mobile_device_configuration_profile_plist": mobiledeviceconfigurationprofilesplist.ResourceJamfProMobileDeviceConfigurationProfilesPlist(),
+			"jamfpro_package":                                   packages.ResourceJamfProPackages(),
+			"jamfpro_policy":                                    policies.ResourceJamfProPolicies(),
+			"jamfpro_printer":                                   printers.ResourceJamfProPrinters(),
+			"jamfpro_script":                                    scripts.ResourceJamfProScripts(),
+			"jamfpro_site":                                      sites.ResourceJamfProSites(),
+			"jamfpro_smart_computer_group":                      smartcomputergroups.ResourceJamfProSmartComputerGroups(),
+			"jamfpro_static_computer_group":                     staticcomputergroups.ResourceJamfProStaticComputerGroups(),
+			"jamfpro_restricted_software":                       restrictedsoftware.ResourceJamfProRestrictedSoftwares(),
+			"jamfpro_user_group":                                usergroups.ResourceJamfProUserGroups(),
+			"jamfpro_webhook":                                   webhooks.ResourceJamfProWebhooks(),
 		},
 	}
 
@@ -386,9 +395,9 @@ func Provider() *schema.Provider {
 					MaxConcurrentRequests: d.Get("max_concurrent_requests").(int),
 				},
 				Timeout: httpclient.TimeoutConfig{
-					TokenRefreshBufferPeriod: time.Duration(d.Get("token_refresh_buffer_period").(int)) * time.Minute,
-					TotalRetryDuration:       time.Duration(d.Get("total_retry_duration").(int)) * time.Second,
-					CustomTimeout:            time.Duration(d.Get("custom_timeout").(int)) * time.Second,
+					TokenRefreshBufferPeriod: helpers.JSONDuration(time.Duration(d.Get("token_refresh_buffer_period").(int)) * time.Minute),
+					TotalRetryDuration:       helpers.JSONDuration(time.Duration(d.Get("total_retry_duration").(int)) * time.Second),
+					CustomTimeout:            helpers.JSONDuration(time.Duration(d.Get("custom_timeout").(int)) * time.Second),
 				},
 				Redirect: httpclient.RedirectConfig{},
 			},

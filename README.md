@@ -1,5 +1,11 @@
 # Terraform Provider for Jamf Pro
 
+## Disclaimer
+
+**This project is under active development, and new releases may introduce changes that are not backward compatible with previous versions. Users should be aware that older implementations may break with updates. We recommend thoroughly reviewing release notes and testing new versions in a staging environment before deploying to production.**
+
+## Introduction
+
 This repository hosts the Jamf Pro Community Provider, built to integrate Jamf Pro's robust configuration management capabilities with Terraform's Infrastructure as Code (IaC) approach. Utilizing a comprehensive JAMF Pro SDK [go-api-sdk-jamfpro](https://github.com/deploymenttheory/go-api-sdk-jamfpro), which serves as a cohesive abstraction layer over both Jamf Pro and Jamf Pro Classic APIs, this provider ensures seamless API interactions and brings a wide array of resources under Terraform's management umbrella. The jamfpro provider is engineered to enrich your CI/CD workflows with Jamf Pro's extensive device management functionalities, encompassing device enrollment, inventory tracking, security compliance, and streamlined software deployment. Its primary goal is to enhance the efficiency of managing, deploying, and maintaining Apple devices across your infrastructure, fostering a synchronized and effective IT ecosystem.
 
 The provider contains:
@@ -41,9 +47,11 @@ The follow is a summary of the resources and their completion status.
 
 Resources can have the following statuses:
 
-- **Experimental** - The resource is in the early stages of development and may not be fully functional. It is not recommended for production use.
+- **Beta** - The resource is in the early stages of development and may not be fully functional. It is not recommended for use in production environments as it may contain bugs and undergo significant changes.
 
-- **Finished** - The resource is fully functional and has been tested in a production environment.
+- **Community Preview** - The resource is available for public use and feedback. While it has reached a level of stability beyond Beta, it may still undergo changes based on community input and additional testing. Users are encouraged to try it out and provide feedback, but should be cautious when using it in production environments.
+
+- **Finished** - The resource is fully functional and has been tested in a production environment. It is considered stable and reliable for use in live systems. Users can confidently integrate this resource into their production workflows.
 
 ## Supported Jamf Pro Resources
 
@@ -53,28 +61,35 @@ This section outlines the resources and data sources provided by our Terraform p
 
 - **Resource & Data Source**: Enables the management of Account within Jamf Pro, allowing for the configuration of accounts, access levels, privileges, assignment to groups and sites and other details.
 
-- **Status**: Finished
+- **Status**: Community Preview
 - **Availability**: Introduced in version `v0.0.44.`
 
 ### Account Groups
 
 - **Resource & Data Source**: Enables the management of Account Groups within Jamf Pro, allowing for the configuration of group names, access levels, privileges, and member details.
 
-- **Status**: Finished
+- **Status**: Community Preview
 - **Availability**: Introduced in version `v0.0.31.`
+
+### Activation Code
+
+- **Resource & Data Source**: Enables the management of the Activation Code within Jamf Pro, allowing for the configuration of activation code and organization details.
+
+- **Status**: Community Preview
+- **Availability**: Introduced in version `v0.0.57.`
 
 ### API Roles
 
 - **Resource & Data Source**: Enables the management of API roles within Jamf Pro, allowing for the configuration of role names, privileges, and other details. these can be assigned to api integrations.
 
-- **Status**: Finished
+- **Status**: Community Preview
 - **Availability**: Introduced in version `v0.0.44.`
 
 ### API Integrations
 
 - **Resource & Data Source**: Enables the management of API integrations within Jamf Pro, allowing for the configuration of integration names, privileges, and other details.
 
-- **Status**: Finished
+- **Status**: Community Preview
 - **Availability**: Introduced in version `v0.0.44.`
 
 ### Buildings
@@ -105,18 +120,18 @@ This section outlines the resources and data sources provided by our Terraform p
 - **Status**: Finished
 - **Availability**: Introduced in version `v0.0.43.`
 
-### macOS Configuration Profiles
+### macOS Configuration Profiles (Plist)
 
 - **Resource & Data Source**: Facilitates the management of macOS configuration profiles in Jamf Pro. This includes the creation, update, and deletion of configuration profiles, along with the ability to specify profile payloads and associated properties.
 
-- **Status**: Experimental
+- **Status**: Community Preview
 - **Availability**: Introduced in version `v0.0.37.`
 
-### Mobile Device Configuration Profiles
+### Mobile Device Configuration Profiles (Plist)
 
 - **Resource & Data Source**: Facilitates the management of mobile device configuration profiles in Jamf Pro. This includes the creation, update, and deletion of configuration profiles, along with the ability to specify profile payloads and associated properties.
 
-- **Status**: Experimental
+- **Status**: Community Preview
 - **Availability**: Introduced in version `v0.0.48.`
 
 ### Packages
@@ -124,7 +139,7 @@ This section outlines the resources and data sources provided by our Terraform p
 - **Resource & Data Source**: Facilitates the management of Packages in Jamf Pro. This includes the creation, update, and deletion of package entities, along with the ability to specify package payloads and associated properties. It uploads the package to the JCDS 2.0 CDN in AWS S3 and then creates the
 package metadata in Jamf Pro.
 
-- **Status**: Experimental
+- **Status**: Community Preview
 - **Availability**: Introduced in version  `v0.0.34.`
 
 ### Scripts

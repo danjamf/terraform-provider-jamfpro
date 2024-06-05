@@ -1,34 +1,41 @@
-# Terraform Provider Registry release workflow.
-name: Terraform Provider Release
+# Terraform Provider release workflow.
+name: Release
 
 # This GitHub action creates a release when a tag that matches the pattern
 # "v*" (e.g. v0.1.0) is created.
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
+
+# Releases need permissions to read and write the repository contents.
+# GitHub considers creating releases and uploading assets as writing contents.
+permissions:
+  contents: write
 
 jobs:
-  # Release for Partner and Community Providers
-  terraform-provider-release:
-    name: 'Terraform Provider Release'
-    uses: hashicorp/ghaction-terraform-provider-release/.github/workflows/community.yml@v4.0.1
-    secrets:
-      gpg-private-key: '${{ secrets.GPG_PRIVATE_KEY }}'  # Your GPG private key
-      gpg-private-key-passphrase: '${{ secrets.GPG_PRIVATE_KEY_PASSPHRASE }}'  # Passphrase for your GPG key, if applicable
-    with:
-      release-notes: false # Set to true if you have release notes to include
-      setup-go-version: '1.22' # Specify the Go version needed
-  release-notes:
+  goreleaser:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
         with:
+          # Allow goreleaser to access older tag information.
           fetch-depth: 0
-      - name: Generate Release Notes
-        run: sed -n -e "1{/# /d;}" -e "2{/^$/d;}" -e "/# $(git describe --abbrev=0 --exclude="$(git describe --abbrev=0 --match='v*.*.*' --tags)" --match='v*.*.*' --tags | tr -d v)/q;p" CHANGELOG.md > release-notes.txt
-      - uses: actions/upload-artifact@v4
+      - uses: actions/setup-go@cdcb36043654635271a94b9a6d1392de5bb323a7 # v5.0.1
         with:
-          name: release-notes
-          path: release-notes.txt
-          retention-days: 1
+          go-version-file: "go.mod"
+          cache: true
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@01dd5d3ca463c7f10f7f4f7b4f177225ac661ee4 # v6.1.0
+        id: import_gpg
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@5742e2a039330cbb23ebf35f046f814d4c6ff811 # v5.1.0
+        with:
+          args: release --clean
+        env:
+          # GitHub sets the GITHUB_TOKEN secret automatically.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}

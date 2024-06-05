@@ -74,6 +74,17 @@ func ResourceJamfProApiIntegrations() *schema.Resource {
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Description: "The list of authorization roles scoped to the API integration.",
 			},
+			"client_secret_request": {
+				Type:        schema.TypeBool,
+				Default:     false,
+				Optional:	 true,
+				Description: "Whether a client secret is required as part of this request.",
+			},
+			"client_secret": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The client secret of the API integration (if requested).",
+			},
 		},
 	}
 }
@@ -136,6 +147,28 @@ func ResourceJamfProApiIntegrationsCreate(ctx context.Context, d *schema.Resourc
 		diags = append(diags, readDiags...)
 	}
 
+	//code block if client_secret also requested
+	if (d.Get("client_secret_request").(bool)){
+		var clientSecretResponse *jamfpro.ResourceClientCredentials
+
+		err = retry.RetryContext(ctx, d.Timeout(schema.TimeoutCreate), func() *retry.RetryError {
+			var apiErr error
+			clientSecretResponse, apiErr = conn.RefreshClientCredentialsByApiRoleID(d.Id())
+			if apiErr != nil {
+				return retry.RetryableError(apiErr)
+			}
+			// No error, exit the retry loop
+			return nil
+		})
+	
+		if err != nil {
+			return diag.FromErr(fmt.Errorf("failed to create Jamf Pro API client secret '%s' after retries: %v", resource.DisplayName, err))
+		}
+	
+		// Set the client_secret in Terraform state
+		d.Set("client_secret", clientSecretResponse.ClientSecret)
+	
+	}
 	return diags
 }
 

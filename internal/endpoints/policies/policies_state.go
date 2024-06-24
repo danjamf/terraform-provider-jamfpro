@@ -354,7 +354,7 @@ func statePayloads(d *schema.ResourceData, resp *jamfpro.ResourcePolicy, diags *
 
 	// DiskEncryption
 	prepStatePayloadDiskEncryption(&out, resp)
-	
+
 	// Packages
 	prepStatePayloadPackages(&out, resp)
 
@@ -380,6 +380,7 @@ func prepStatePayloadDiskEncryption(out *[]map[string]interface{}, resp *jamfpro
 	outMap["auth_restart"] = resp.DiskEncryption.AuthRestart
 	(*out)[0]["disk_encryption"] = append((*out)[0]["disk_encryption"].([]map[string]interface{}), outMap)
 }
+
 // Reads response and preps package payload items
 func prepStatePayloadPackages(out *[]map[string]interface{}, resp *jamfpro.ResourcePolicy) {
 	if resp.PackageConfiguration == nil {

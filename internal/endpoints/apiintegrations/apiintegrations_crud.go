@@ -37,7 +37,28 @@ func resourceJamfProApiIntegrationsCreate(ctx context.Context, d *schema.Resourc
 	}
 
 	d.SetId(strconv.Itoa(creationResponse.ID))
+	//code block if client_secret also requested
+	if d.Get("client_secret_request").(bool) {
+		var clientSecretResponse *jamfpro.ResourceClientCredentials
 
+		err = retry.RetryContext(ctx, d.Timeout(schema.TimeoutCreate), func() *retry.RetryError {
+			var apiErr error
+			clientSecretResponse, apiErr = client.RefreshClientCredentialsByApiRoleID(d.Id())
+			if apiErr != nil {
+				return retry.RetryableError(apiErr)
+			}
+			// No error, exit the retry loop
+			return nil
+		})
+
+		if err != nil {
+			return diag.FromErr(fmt.Errorf("failed to create Jamf Pro API client secret '%s' after retries: %v", resource.DisplayName, err))
+		}
+
+		// Set the client_secret in Terraform state
+		d.Set("client_secret", clientSecretResponse.ClientSecret)
+
+	}
 	return append(diags, resourceJamfProApiIntegrationsReadNoCleanup(ctx, d, meta)...)
 }
 

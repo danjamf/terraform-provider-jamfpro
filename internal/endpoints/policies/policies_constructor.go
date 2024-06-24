@@ -238,8 +238,6 @@ func constructScope(d *schema.ResourceData, resource *jamfpro.ResourcePolicy) er
 	return nil
 }
 
-
-
 // Pulls "self service" settings from HCL and packages into object
 func constructSelfService(d *schema.ResourceData, out *jamfpro.ResourcePolicy) {
 
@@ -280,12 +278,11 @@ func constructPayloadDiskEncryption(d *schema.ResourceData, out *jamfpro.Resourc
 
 	if len(d.Get("payloads.0.disk_encryption").([]interface{})) > 0 {
 		out.DiskEncryption = &jamfpro.PolicySubsetDiskEncryption{
-			Action:      d.Get("payloads.0.disk_encryption.0.action").(string),
-			DiskEncryptionConfigurationID: d.Get("payloads.0.disk_encryption.0.disk_encryption_configuration_id").(int),
-			AuthRestart:      d.Get("payloads.0.disk_encryption.0.auth_restart").(bool),
-			RemediateKeyType:      d.Get("payloads.0.disk_encryption.0.remediate_key_type").(string),
+			Action:                                 d.Get("payloads.0.disk_encryption.0.action").(string),
+			DiskEncryptionConfigurationID:          d.Get("payloads.0.disk_encryption.0.disk_encryption_configuration_id").(int),
+			AuthRestart:                            d.Get("payloads.0.disk_encryption.0.auth_restart").(bool),
+			RemediateKeyType:                       d.Get("payloads.0.disk_encryption.0.remediate_key_type").(string),
 			RemediateDiskEncryptionConfigurationID: d.Get("payloads.0.disk_encryption.0.remediate_disk_encryption_configuration_id").(int),
-
 		}
 	}
 }

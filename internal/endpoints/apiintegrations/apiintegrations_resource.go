@@ -63,6 +63,17 @@ func ResourceJamfProApiIntegrations() *schema.Resource {
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Description: "The list of authorization roles scoped to the API integration.",
 			},
+			"client_secret_request": {
+				Type:        schema.TypeBool,
+				Default:     false,
+				Optional:    true,
+				Description: "Whether a client secret is required as part of this request.",
+			},
+			"client_secret": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The client secret of the API integration (if requested).",
+			},
 		},
 	}
 }
